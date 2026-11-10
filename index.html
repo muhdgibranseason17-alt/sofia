@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Untuk Sofia ❤️ | Maafkan Aku</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Playfair Display & Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        serif: ['"Playfair Display"', 'serif'],
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                    },
+                    colors: {
+                        cream: '#FFFDF9',
+                        warmCream: '#FAF3E0',
+                        pastelPink: '#FFE5EC',
+                        softPink: '#FFB3C6',
+                        roseGold: '#B76E79',
+                        deepRose: '#8E4A55',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #FFFDF9;
+            color: #4A3538;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        /* Canvas untuk kelopak bunga & hati */
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* 3D Flip Card Styles */
+        .perspective-1000 {
+            perspective: 1000px;
+        }
+        .transform-style-3d {
+            transform-style: preserve-3d;
+        }
+        .backface-hidden {
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
+        .rotate-y-180 {
+            transform: rotateY(180deg);
+        }
+        .flip-card-inner {
+            transition: transform 0.7s cubic-bezier(0.4, 0.2, 0.2, 1);
+        }
+        .flip-card.flipped .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+
+        /* Envelope Animation */
+        .envelope-wrapper {
+            transition: transform 0.6s ease, opacity 0.8s ease;
+        }
+        .envelope-flap {
+            transform-origin: top center;
+            transition: transform 0.6s ease-in-out;
+        }
+        .envelope-open .envelope-flap {
+            transform: rotateX(180deg);
+        }
+        .envelope-letter {
+            transition: transform 0.7s ease-in-out 0.2s;
+        }
+        .envelope-open .envelope-letter {
+            transform: translateY(-45px);
+        }
+
+        /* Fade in sections */
+        .fade-in-up {
+            animation: fadeInUp 0.9s ease forwards;
+        }
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(24px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Floating gentle animation */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+        }
+        .animate-float {
+            animation: float 3.5s ease-in-out infinite;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #FFFDF9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #FFB3C6;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #B76E79;
+        }
+    </style>
+</head>
+<body class="font-sans antialiased selection:bg-pastelPink selection:text-deepRose">
+
+    <!-- Background Falling Petals & Hearts Canvas -->
+    <canvas id="bg-canvas"></canvas>
+
+    <!-- Toast Notification (Pengganti alert) -->
+    <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-deepRose text-white px-6 py-3 rounded-full shadow-xl opacity-0 pointer-events-none transition-all duration-300 flex items-center gap-2 text-sm font-medium">
+        <span id="toast-icon">✨</span>
+        <span id="toast-message">Pesan</span>
+    </div>
+
+    <!-- 1. HALAMAN PEMBUKA (ENVELOPE HERO) -->
+    <section id="envelope-screen" class="fixed inset-0 z-40 flex flex-col items-center justify-center bg-gradient-to-br from-cream via-pastelPink/60 to-warmCream px-4 transition-all duration-1000">
+        <div class="text-center mb-8 animate-float">
+            <span class="inline-block px-4 py-1.5 rounded-full bg-white/80 border border-softPink text-roseGold text-xs font-semibold tracking-widest uppercase mb-3 shadow-sm">
+                Sebuah Pesan Khusus
+            </span>
+            <h1 class="font-serif text-3xl sm:text-5xl font-bold text-deepRose">Untuk Sofia ❤️</h1>
+            <p class="text-sm sm:text-base text-roseGold/90 mt-2">Ketuk amplop di bawah ini untuk membukanya</p>
+        </div>
+
+        <!-- Interactive Envelope -->
+        <div id="envelope" onclick="openEnvelope()" class="relative w-72 sm:w-80 h-48 sm:h-52 cursor-pointer group perspective-1000">
+            <!-- Envelope Back -->
+            <div class="absolute inset-0 bg-roseGold rounded-2xl shadow-2xl border-2 border-white/50"></div>
+            
+            <!-- Letter inside -->
+            <div class="envelope-letter absolute inset-x-4 top-3 bottom-3 bg-cream rounded-xl shadow-md p-4 flex flex-col items-center justify-center text-center border border-pastelPink">
+                <span class="text-2xl mb-1">💌</span>
+                <p class="font-serif italic text-deepRose font-semibold text-sm sm:text-base">"Maafkan aku ya, Sofia..."</p>
+                <p class="text-xs text-roseGold mt-1">Ada sesuatu yang ingin kusampaikan</p>
+            </div>
+
+            <!-- Envelope Front Pocket -->
+            <div class="absolute inset-0 bg-gradient-to-b from-pastelPink to-softPink rounded-2xl shadow-inner border border-white/60" style="clip-path: polygon(0 35%, 50% 65%, 100% 35%, 100% 100%, 0 100%);"></div>
+
+            <!-- Envelope Flap -->
+            <div class="envelope-flap absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-softPink to-pastelPink rounded-t-2xl border-t border-white/70 shadow-md flex items-end justify-center pb-4" style="clip-path: polygon(0 0, 100% 0, 50% 75%);">
+            </div>
+
+            <!-- Wax Seal -->
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-deepRose rounded-full shadow-lg border-2 border-white/80 flex items-center justify-center text-white text-xl group-hover:scale-110 transition-transform duration-300 z-10">
+                ❤️
+            </div>
+        </div>
+
+        <button onclick="openEnvelope()" class="mt-10 px-6 py-2.5 rounded-full bg-white/90 hover:bg-white text-deepRose font-medium text-sm shadow-md border border-softPink transition-all hover:scale-105 active:scale-95">
+            Buka Surat ✨
+        </button>
+    </section>
+
+    <!-- MAIN CONTENT (Hidden initially, revealed after envelope opens) -->
+    <main id="main-content" class="relative z-10 hidden opacity-0 transition-opacity duration-1000 pb-20">
+        
+        <!-- Header / Mini Nav -->
+        <header class="pt-10 pb-4 px-4 text-center">
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-pastelPink/70 border border-softPink/50 text-deepRose text-xs font-semibold tracking-wider uppercase mb-3">
+                <span>🌸</span> Untukmu, Sofia
+            </div>
+            <h1 class="font-serif text-4xl sm:text-5xl font-bold text-deepRose leading-tight">
+                Maafkan Aku, Sofia
+            </h1>
+        </header>
+
+        <!-- 2. SURAT PERMINTAAN MAAF UTAMA -->
+        <section class="max-w-2xl mx-auto px-4 sm:px-6 my-8">
+            <div class="bg-white/90 backdrop-blur-sm rounded-3xl p-6 sm:p-9 shadow-xl border border-pastelPink relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-20 h-20 bg-pastelPink/40 rounded-bl-full -mr-5 -mt-5"></div>
+
+                <div class="relative z-10">
+                    <h2 class="font-serif text-2xl font-bold text-deepRose mb-4">Untuk Sofia,</h2>
+
+                    <div class="space-y-3 text-sm sm:text-base leading-relaxed text-[#5C4246]">
+                        <p>
+                            Aku benar-benar minta maaf atas kesalahanku kemarin. Tidak ada alasan apa pun—aku sadar aku salah, egois, dan sudah membuatmu kecewa.
+                        </p>
+                        <p>
+                            Melihatmu sedih atau diam karena ulahku adalah hal yang paling aku sesali. Seharusnya aku bisa menjaga perasaanmu jauh lebih baik dari ini.
+                        </p>
+                        <p>
+                            Kamu terlalu berharga untuk disakiti. Aku tidak hanya ingin mengucap maaf, tapi juga menebus kesalahanku lewat sikapku ke depan.
+                        </p>
+                    </div>
+
+                    <div class="mt-6 pt-4 border-t border-pastelPink flex items-center justify-between">
+                        <p class="font-serif italic text-lg text-deepRose font-bold">Dengan penuh penyesalan ❤️</p>
+                        <span class="text-2xl">🌹</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2.5. HAL-HAL YANG AKU SESALI (INTERACTIVE REGRET CARDS) -->
+        <section class="max-w-3xl mx-auto px-4 sm:px-6 my-12">
+            <div class="text-center mb-6">
+                <h2 class="font-serif text-2xl sm:text-3xl font-bold text-deepRose">Hal-Hal yang Aku Sesali</h2>
+                <p class="text-xs sm:text-sm text-roseGold/90 mt-1">Ketuk setiap poin untuk membaca pengakuanku 🥺</p>
+            </div>
+
+            <div class="space-y-3">
+                <button onclick="toggleRegret(this, 'Aku menyesal karena kurang peka dan tidak langsung memahami perasaanmu saat itu.')" class="w-full text-left bg-white/90 hover:bg-pastelPink/40 border border-softPink/70 rounded-2xl p-4 shadow-sm transition-all flex items-center justify-between gap-3">
+                    <div class="flex items-center gap-3">
+                        <span class="text-xl">😔</span>
+                        <span class="font-medium text-sm sm:text-base text-deepRose">Kurang peka terhadap perasaanmu</span>
+                    </div>
+                    <span class="text-xs text-roseGold font-semibold px-3 py-1 rounded-full bg-pastelPink/60">Buka</span>
+                </button>
+
+                <button onclick="toggleRegret(this, 'Aku menyesal membiarkan egoku menang, padahal menjaga hatimu jauh lebih penting dari segalanya.')" class="w-full text-left bg-white/90 hover:bg-pastelPink/40 border border-softPink/70 rounded-2xl p-4 shadow-sm transition-all flex items-center justify-between gap-3">
+                    <div class="flex items-center gap-3">
+                        <span class="text-xl">💔</span>
+                        <span class="font-medium text-sm sm:text-base text-deepRose">Terbawa ego dan sikap keras kepala</span>
+                    </div>
+                    <span class="text-xs text-roseGold font-semibold px-3 py-1 rounded-full bg-pastelPink/60">Buka</span>
+                </button>
+
+                <button onclick="toggleRegret(this, 'Aku menyesal sudah membuat hari-harimu terasa berat dan menghilangkan senyummu.')" class="w-full text-left bg-white/90 hover:bg-pastelPink/40 border border-softPink/70 rounded-2xl p-4 shadow-sm transition-all flex items-center justify-between gap-3">
+                    <div class="flex items-center gap-3">
+                        <span class="text-xl">🌧️</span>
+                        <span class="font-medium text-sm sm:text-base text-deepRose">Membuatmu sedih dan kecewa</span>
+                    </div>
+                    <span class="text-xs text-roseGold font-semibold px-3 py-1 rounded-full bg-pastelPink/60">Buka</span>
+                </button>
+            </div>
+
+            <div id="regret-detail" class="hidden mt-4 bg-pastelPink/50 border border-softPink rounded-2xl p-4 text-center text-sm text-deepRose italic transition-all">
+            </div>
+        </section>
+
+        <!-- 3. KARTU INTERAKTIF 'JANJI-JANJIKU' (3 FLIP CARDS) -->
+        <section class="max-w-4xl mx-auto px-4 sm:px-6 my-12">
+            <div class="text-center mb-8">
+                <h2 class="font-serif text-2xl sm:text-3xl font-bold text-deepRose">3 Janjiku Untukmu</h2>
+                <p class="text-xs sm:text-sm text-roseGold/90 mt-1">Ketuk kartu untuk membukanya 🤍</p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+                <!-- Card 1 -->
+                <div class="flip-card h-48 perspective-1000 cursor-pointer" onclick="this.classList.toggle('flipped')">
+                    <div class="flip-card-inner relative w-full h-full transform-style-3d">
+                        <div class="absolute inset-0 backface-hidden bg-gradient-to-br from-pastelPink to-white rounded-2xl p-5 shadow-md border border-softPink/60 flex flex-col items-center justify-center text-center">
+                            <span class="text-3xl mb-2">👂</span>
+                            <h3 class="font-serif text-lg font-bold text-deepRose">Lebih Sabar Mendengar</h3>
+                            <p class="text-xs text-roseGold mt-1">Ketuk kartu</p>
+                        </div>
+                        <div class="absolute inset-0 backface-hidden rotate-y-180 bg-deepRose text-white rounded-2xl p-5 shadow-lg flex flex-col items-center justify-center text-center">
+                            <p class="text-xs sm:text-sm leading-relaxed">
+                                "Aku berjanji akan lebih sabar mendengar perasaanmu tanpa menyela atau terbawa emosi."
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="flip-card h-48 perspective-1000 cursor-pointer" onclick="this.classList.toggle('flipped')">
+                    <div class="flip-card-inner relative w-full h-full transform-style-3d">
+                        <div class="absolute inset-0 backface-hidden bg-gradient-to-br from-warmCream to-white rounded-2xl p-5 shadow-md border border-softPink/60 flex flex-col items-center justify-center text-center">
+                            <span class="text-3xl mb-2">🛡️</span>
+                            <h3 class="font-serif text-lg font-bold text-deepRose">Tidak Mengulangi</h3>
+                            <p class="text-xs text-roseGold mt-1">Ketuk kartu</p>
+                        </div>
+                        <div class="absolute inset-0 backface-hidden rotate-y-180 bg-deepRose text-white rounded-2xl p-5 shadow-lg flex flex-col items-center justify-center text-center">
+                            <p class="text-xs sm:text-sm leading-relaxed">
+                                "Aku belajar dari kesalahanku dan berjanji tidak akan mengulangi hal yang melukai hatimu lagi."
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="flip-card h-48 perspective-1000 cursor-pointer" onclick="this.classList.toggle('flipped')">
+                    <div class="flip-card-inner relative w-full h-full transform-style-3d">
+                        <div class="absolute inset-0 backface-hidden bg-gradient-to-br from-pastelPink to-white rounded-2xl p-5 shadow-md border border-softPink/60 flex flex-col items-center justify-center text-center">
+                            <span class="text-3xl mb-2">🤗</span>
+                            <h3 class="font-serif text-lg font-bold text-deepRose">Menjaga Senyummu</h3>
+                            <p class="text-xs text-roseGold mt-1">Ketuk kartu</p>
+                        </div>
+                        <div class="absolute inset-0 backface-hidden rotate-y-180 bg-deepRose text-white rounded-2xl p-5 shadow-lg flex flex-col items-center justify-center text-center">
+                            <p class="text-xs sm:text-sm leading-relaxed">
+                                "Aku akan selalu berusaha menjadi alasan bahagiamu setiap hari, bukan alasan sedihmu."
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3.5. PENGUKUR SUASANA HATI SOFIA (INTERACTIVE MOOD SLIDER) -->
+        <section class="max-w-xl mx-auto px-4 sm:px-6 my-12">
+            <div class="bg-white/90 backdrop-blur-sm rounded-3xl p-6 sm:p-8 shadow-lg border border-pastelPink text-center">
+                <h2 class="font-serif text-xl sm:text-2xl font-bold text-deepRose">Seberapa Kesal Sofia Sekarang?</h2>
+                <p class="text-xs sm:text-sm text-roseGold mt-1 mb-5">Geser untuk kasih tahu aku perasaanmu</p>
+
+                <input id="mood-slider" type="range" min="0" max="100" value="70" oninput="updateMood(this.value)" class="w-full accent-deepRose cursor-pointer h-2 bg-pastelPink rounded-lg">
+                
+                <div class="mt-4 p-4 rounded-2xl bg-warmCream/60 border border-pastelPink">
+                    <div id="mood-emoji" class="text-3xl mb-1">😠</div>
+                    <p id="mood-text" class="text-xs sm:text-sm text-deepRose font-medium">Masih kesal banget ya? Maafin aku ya, Sofia...</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. PERTANYAAN PENUTUP INTERAKTIF -->
+        <section class="max-w-xl mx-auto px-4 sm:px-6 my-12 text-center">
+            <div class="bg-gradient-to-b from-white to-pastelPink/50 rounded-3xl p-8 shadow-xl border border-softPink relative">
+                <span class="text-4xl inline-block mb-2 animate-bounce">🥺</span>
+                <h2 class="font-serif text-2xl sm:text-3xl font-bold text-deepRose">Kamu Mau Maafin Aku?</h2>
+                <p class="text-xs sm:text-sm text-roseGold mt-1 mb-6">Semoga kita bisa senyum bareng lagi hari ini.</p>
+
+                <div id="button-container" class="flex flex-col sm:flex-row items-center justify-center gap-4 min-h-[90px] relative">
+                    <button id="btn-forgive" onclick="forgiveMe()" class="px-8 py-3 rounded-full bg-gradient-to-r from-roseGold to-deepRose text-white font-bold text-sm sm:text-base shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 transition-all z-20">
+                        Maafin Aku ❤️
+                    </button>
+
+                    <button id="btn-think" onmouseover="dodgeButton()" onclick="dodgeButton()" class="px-6 py-2.5 rounded-full bg-white text-roseGold border border-softPink font-semibold text-sm shadow-sm transition-all duration-200 z-10">
+                        Masih Marah 😠
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="text-center text-xs text-roseGold/80 py-6">
+            Dibuat dengan sepenuh hati untuk Sofia ❤️
+        </footer>
+    </main>
+
+    <!-- FLOATING MUSIC PLAYER BAR -->
+    <div id="floating-player" class="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-40 hidden items-center gap-3 bg-white/95 backdrop-blur-md px-4 py-2.5 rounded-full shadow-2xl border border-softPink/80 transition-all duration-500">
+        <!-- Album Art Icon -->
+        <div id="album-art" class="w-10 h-10 rounded-full bg-gradient-to-tr from-roseGold to-softPink flex items-center justify-center text-white shadow-inner animate-spin" style="animation-duration: 8s; animation-play-state: paused;">
+            🎵
+        </div>
+        <!-- Song Info -->
+        <div class="pr-2">
+            <p class="font-serif font-bold text-deepRose text-xs sm:text-sm leading-tight">Anugerah Terindah</p>
+            <p id="player-status" class="text-[11px] text-roseGold">Musik Lembut • Siap</p>
+        </div>
+        <!-- Play/Pause Button -->
+        <button id="btn-play-pause" onclick="toggleMusic()" class="w-9 h-9 rounded-full bg-deepRose hover:bg-roseGold text-white flex items-center justify-center text-sm shadow-md transition-transform active:scale-90" title="Putar / Jeda">
+            ▶️
+        </button>
+        <!-- Mute/Unmute Button -->
+        <button id="btn-mute" onclick="toggleMute()" class="w-8 h-8 rounded-full bg-pastelPink/70 hover:bg-pastelPink text-deepRose flex items-center justify-center text-xs transition-transform active:scale-90" title="Bisukan / Suarakan">
+            🔊
+        </button>
+    </div>
+
+    <!-- MODAL TERIMA KASIH (Saat 'Iya, Aku Maafin' diklik) -->
+    <div id="thank-you-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40 backdrop-blur-sm px-4">
+        <div class="bg-cream rounded-3xl p-8 max-w-md w-full text-center shadow-2xl border-2 border-softPink transform scale-95 transition-transform duration-300" id="modal-box">
+            <div class="text-5xl mb-4">🥳❤️</div>
+            <h3 class="font-serif text-3xl font-bold text-deepRose">Yeay! Terima Kasih, Sofia!</h3>
+            <p class="text-sm sm:text-base text-[#5C4246] mt-3 leading-relaxed">
+                Kamu bikin aku jadi orang paling bahagia hari ini! Aku janji nggak akan menyia-nyiakan kesempatan ini. Love you so much, Sofia! 💖
+            </p>
+            <button onclick="closeModal()" class="mt-6 px-8 py-3 rounded-full bg-deepRose text-white font-semibold text-sm shadow-md hover:bg-roseGold transition-all">
+                Peluk Virtual 🫂
+            </button>
+        </div>
+    </div>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // 1. Buka Amplop
+        function openEnvelope() {
+            const envelope = document.getElementById('envelope');
+            const envelopeScreen = document.getElementById('envelope-screen');
+            const mainContent = document.getElementById('main-content');
+            const floatingPlayer = document.getElementById('floating-player');
+
+            envelope.classList.add('envelope-open');
+            startRomanticMusic();
+
+            setTimeout(() => {
+                envelopeScreen.style.opacity = '0';
+                envelopeScreen.style.pointerEvents = 'none';
+                
+                mainContent.classList.remove('hidden');
+                floatingPlayer.classList.remove('hidden');
+                floatingPlayer.classList.add('flex');
+                setTimeout(() => {
+                    mainContent.style.opacity = '1';
+                    envelopeScreen.style.display = 'none';
+                }, 100);
+            }, 900);
+        }
+
+        // --- WEB AUDIO API: ROMANTIC MUSIC-BOX / PIANO PROGRESSION ---
+        let audioCtx = null;
+        let isPlaying = false;
+        let isMuted = false;
+        let musicInterval = null;
+        let chordStep = 0;
+
+        // Progresi akor romantis (G - D/F# - Em - C) bergaya Anugerah Terindah
+        const chords = [
+            [392.00, 493.88, 587.33, 783.99], // G major
+            [369.99, 440.00, 587.33, 739.99], // D/F#
+            [329.63, 493.88, 659.25, 783.99], // Em7
+            [261.63, 392.00, 523.25, 659.25]  // C major
+        ];
+
+        function playSoftNote(freq, delay, duration = 1.6) {
+            if (!audioCtx || isMuted || !isPlaying) return;
+            const now = audioCtx.currentTime + delay;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(freq, now);
+
+            gain.gain.setValueAtTime(0.0001, now);
+            gain.gain.linearRampToValueAtTime(0.045, now + 0.08);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            osc.start(now);
+            osc.stop(now + duration);
+        }
+
+        function playNextChord() {
+            if (!isPlaying) return;
+            const currentChord = chords[chordStep % chords.length];
+            currentChord.forEach((freq, idx) => {
+                playSoftNote(freq, idx * 0.22, 1.8);
+            });
+            chordStep++;
+        }
+
+        function startRomanticMusic() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            if (!isPlaying) {
+                isPlaying = true;
+                updatePlayerUI();
+                playNextChord();
+                musicInterval = setInterval(playNextChord, 2200);
+            }
+        }
+
+        function toggleMusic() {
+            if (!audioCtx) {
+                startRomanticMusic();
+                return;
+            }
+            isPlaying = !isPlaying;
+            if (isPlaying) {
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                playNextChord();
+                musicInterval = setInterval(playNextChord, 2200);
+            } else {
+                clearInterval(musicInterval);
+            }
+            updatePlayerUI();
+        }
+
+        function toggleMute() {
+            isMuted = !isMuted;
+            updatePlayerUI();
+            showToast(isMuted ? 'Musik dibisukan 🔇' : 'Musik disuarakan 🔊', isMuted ? '🔇' : '🎵');
+        }
+
+        function updatePlayerUI() {
+            const btnPlay = document.getElementById('btn-play-pause');
+            const btnMute = document.getElementById('btn-mute');
+            const status = document.getElementById('player-status');
+            const albumArt = document.getElementById('album-art');
+
+            btnPlay.textContent = isPlaying ? '⏸️' : '▶️';
+            btnMute.textContent = isMuted ? '🔇' : '🔊';
+            status.textContent = isPlaying ? (isMuted ? 'Dibisukan' : 'Sedang Diputar...') : 'Dijeda';
+            albumArt.style.animationPlayState = (isPlaying && !isMuted) ? 'running' : 'paused';
+        }
+
+        // 2. Toast Notification Helper
+        function showToast(message, icon = '✨') {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toast-message');
+            const toastIcon = document.getElementById('toast-icon');
+
+            toastMsg.textContent = message;
+            toastIcon.textContent = icon;
+            toast.classList.remove('opacity-0', 'pointer-events-none');
+            toast.classList.add('opacity-100');
+
+            setTimeout(() => {
+                toast.classList.remove('opacity-100');
+                toast.classList.add('opacity-0', 'pointer-events-none');
+            }, 3000);
+        }
+
+        // 2.5. Interaksi Kartu Penyesalan & Mood Slider
+        function toggleRegret(btn, detailText) {
+            const detailBox = document.getElementById('regret-detail');
+            detailBox.textContent = `"${detailText}"`;
+            detailBox.classList.remove('hidden');
+            showToast('Terima kasih sudah mau membaca pengakuanku 🤍', '🥺');
+        }
+
+        function updateMood(val) {
+            const emoji = document.getElementById('mood-emoji');
+            const text = document.getElementById('mood-text');
+            const num = parseInt(val, 10);
+
+            if (num >= 75) {
+                emoji.textContent = '😠';
+                text.textContent = 'Masih kesal banget ya? Aku benar-benar minta maaf, Sofia...';
+            } else if (num >= 40) {
+                emoji.textContent = '😔';
+                text.textContent = 'Masih agak kecewa ya? Aku janji akan perbaiki semuanya.';
+            } else if (num >= 15) {
+                emoji.textContent = '🥺';
+                text.textContent = 'Sudah mulai reda ya? Terima kasih sudah mau dengerin aku.';
+            } else {
+                emoji.textContent = '🥰';
+                text.textContent = 'Yeay! Makasih sudah nggak marah lagi, Sofia! ❤️';
+                burstHearts();
+            }
+        }
+
+        // 3. Tombol 'Masih Marah' Menghindar & Mengecil
+        let dodgeCount = 0;
+        function dodgeButton() {
+            const btn = document.getElementById('btn-think');
+            const container = document.getElementById('button-container');
+            dodgeCount++;
+
+            const maxX = Math.max(40, container.clientWidth / 2 - 70);
+            const randomX = (Math.random() * 2 - 1) * maxX;
+            const randomY = (Math.random() * 2 - 1) * 35;
+            const scale = Math.max(0.55, 1 - dodgeCount * 0.08);
+
+            btn.style.transform = `translate(${randomX}px, ${randomY}px) scale(${scale})`;
+
+            if (dodgeCount === 3) {
+                showToast('Jangan marah lama-lama ya, Sofia 🥺', '🤍');
+            } else if (dodgeCount >= 6) {
+                btn.style.opacity = '0';
+                btn.style.pointerEvents = 'none';
+                showToast('Tombolnya kabur! Berarti udah maafin ya? ❤️', '✨');
+            }
+        }
+
+        // 4. Tombol 'Maafin Aku' & Modal Terima Kasih
+        function forgiveMe() {
+            const modal = document.getElementById('thank-you-modal');
+            const modalBox = document.getElementById('modal-box');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            setTimeout(() => {
+                modalBox.classList.remove('scale-95');
+                modalBox.classList.add('scale-100');
+            }, 20);
+            burstHearts();
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('thank-you-modal');
+            const modalBox = document.getElementById('modal-box');
+            modalBox.classList.remove('scale-100');
+            modalBox.classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }, 250);
+        }
+
+        // 5. Canvas Animasi Kelopak Bunga & Hati Berjatuhan
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        function createParticle(isBurst = false) {
+            const emojis = ['🌸', '❤️', '🤍', '🌷', '✨'];
+            return {
+                x: isBurst ? canvas.width / 2 + (Math.random() - 0.5) * 120 : Math.random() * canvas.width,
+                y: isBurst ? canvas.height / 2 : -20,
+                size: Math.random() * 14 + 12,
+                speedY: isBurst ? (Math.random() - 0.5) * 8 - 2 : Math.random() * 1.4 + 0.7,
+                speedX: isBurst ? (Math.random() - 0.5) * 10 : (Math.random() - 0.5) * 0.8,
+                opacity: Math.random() * 0.5 + 0.4,
+                emoji: emojis[Math.floor(Math.random() * emojis.length)],
+                isBurst
+            };
+        }
+
+        for (let i = 0; i < 22; i++) {
+            const p = createParticle();
+            p.y = Math.random() * canvas.height;
+            particles.push(p);
+        }
+
+        function burstHearts() {
+            for (let i = 0; i < 30; i++) {
+                particles.push(createParticle(true));
+            }
+        }
+
+        function animateCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const p = particles[i];
+                p.x += p.speedX;
+                p.y += p.speedY;
+
+                if (p.isBurst) {
+                    p.speedY += 0.15;
+                    p.opacity -= 0.012;
+                }
+
+                ctx.save();
+                ctx.globalAlpha = Math.max(0, p.opacity);
+                ctx.font = `${p.size}px sans-serif`;
+                ctx.fillText(p.emoji, p.x, p.y);
+                ctx.restore();
+
+                if (p.isBurst && p.opacity <= 0) {
+                    particles.splice(i, 1);
+                } else if (!p.isBurst && p.y > canvas.height + 30) {
+                    particles[i] = createParticle(false);
+                }
+            }
+
+            requestAnimationFrame(animateCanvas);
+        }
+
+        window.onload = function () {
+            animateCanvas();
+        };
+    </script>
+</body>
+</html>
