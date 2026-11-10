@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Untuk Sofia ❤️ | Maafkan Aku</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Playfair Display & Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        serif: ['"Playfair Display"', 'serif'],
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                    },
+                    colors: {
+                        cream: '#FFFDF9',
+                        warmCream: '#FAF3E0',
+                        pastelPink: '#FFE5EC',
+                        softPink: '#FFB3C6',
+                        roseGold: '#B76E79',
+                        deepRose: '#8E4A55',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #FFFDF9;
+            color: #4A3538;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        /* Canvas untuk kelopak bunga & hati */
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* 3D Flip Card Styles */
+        .perspective-1000 {
+            perspective: 1000px;
+        }
+        .transform-style-3d {
+            transform-style: preserve-3d;
+        }
+        .backface-hidden {
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
+        .rotate-y-180 {
+            transform: rotateY(180deg);
+        }
+        .flip-card-inner {
+            transition: transform 0.7s cubic-bezier(0.4, 0.2, 0.2, 1);
+        }
+        .flip-card.flipped .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+
+        /* Envelope Animation */
+        .envelope-wrapper {
+            transition: transform 0.6s ease, opacity 0.8s ease;
+        }
+        .envelope-flap {
+            transform-origin: top center;
+            transition: transform 0.6s ease-in-out;
+        }
+        .envelope-open .envelope-flap {
+            transform: rotateX(180deg);
+        }
+        .envelope-letter {
+            transition: transform 0.7s ease-in-out 0.2s;
+        }
+        .envelope-open .envelope-letter {
+            transform: translateY(-45px);
+        }
+
+        /* Fade in sections */
+        .fade-in-up {
+            animation: fadeInUp 0.9s ease forwards;
+        }
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(24px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Floating gentle animation */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+        }
+        .animate-float {
+            animation: float 3.5s ease-in-out infinite;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #FFFDF9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #FFB3C6;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #B76E79;
+        }
+    </style>
+</head>
+<body class="font-sans antialiased selection:bg-pastelPink selection:text-deepRose">
+
+    <!-- Background Falling Petals & Hearts Canvas -->
+    <canvas id="bg-canvas"></canvas>
+
+    <!-- Toast Notification (Pengganti alert) -->
+    <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-deepRose text-white px-6 py-3 rounded-full shadow-xl opacity-0 pointer-events-none transition-all duration-300 flex items-center gap-2 text-sm font-medium">
+        <span id="toast-icon">✨</span>
+        <span id="toast-message">Pesan</span>
+    </div>
+
+    <!-- 1. HALAMAN PEMBUKA (ENVELOPE HERO) -->
+    <section id="envelope-screen" class="fixed inset-0 z-40 flex flex-col items-center justify-center bg-gradient-to-br from-cream via-pastelPink/60 to-warmCream px-4 transition-all duration-1000">
+        <div class="text-center mb-8 animate-float">
+            <span class="inline-block px-4 py-1.5 rounded-full bg-white/80 border border-softPink text-roseGold text-xs font-semibold tracking-widest uppercase mb-3 shadow-sm">
+                Sebuah Pesan Khusus
+            </span>
+            <h1 class="font-serif text-3xl sm:text-5xl font-bold text-deepRose">Untuk Sofia ❤️</h1>
+            <p class="text-sm sm:text-base text-roseGold/90 mt-2">Ketuk amplop di bawah ini untuk membukanya</p>
+        </div>
+
+        <!-- Interactive Envelope -->
+        <div id="envelope" onclick="openEnvelope()" class="relative w-72 sm:w-80 h-48 sm:h-52 cursor-pointer group perspective-1000">
+            <!-- Envelope Back -->
+            <div class="absolute inset-0 bg-roseGold rounded-2xl shadow-2xl border-2 border-white/50"></div>
+            
+            <!-- Letter inside -->
+            <div class="envelope-letter absolute inset-x-4 top-3 bottom-3 bg-cream rounded-xl shadow-md p-4 flex flex-col items-center justify-center text-center border border-pastelPink">
+                <span class="text-2xl mb-1">💌</span>
+                <p class="font-serif italic text-deepRose font-semibold text-sm sm:text-base">"Maafkan aku ya, Sofia..."</p>
+                <p class="text-xs text-roseGold mt-1">Ada sesuatu yang ingin kusampaikan</p>
+            </div>
+
+            <!-- Envelope Front Pocket -->
+            <div class="absolute inset-0 bg-gradient-to-b from-pastelPink to-softPink rounded-2xl shadow-inner border border-white/60" style="clip-path: polygon(0 35%, 50% 65%, 100% 35%, 100% 100%, 0 100%);"></div>
+
+            <!-- Envelope Flap -->
+            <div class="envelope-flap absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-softPink to-pastelPink rounded-t-2xl border-t border-white/70 shadow-md flex items-end justify-center pb-4" style="clip-path: polygon(0 0, 100% 0, 50% 75%);">
+            </div>
+
+            <!-- Wax Seal -->
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-deepRose rounded-full shadow-lg border-2 border-white/80 flex items-center justify-center text-white text-xl group-hover:scale-110 transition-transform duration-300 z-10">
+                ❤️
+            </div>
+        </div>
+
+        <button onclick="openEnvelope()" class="mt-10 px-6 py-2.5 rounded-full bg-white/90 hover:bg-white text-deepRose font-medium text-sm shadow-md border border-softPink transition-all hover:scale-105 active:scale-95">
+            Buka Surat ✨
+        </button>
+    </section>
+
+    <!-- MAIN CONTENT (Hidden initially, revealed after envelope opens) -->
+    <main id="main-content" class="relative z-10 hidden opacity-0 transition-opacity duration-1000 pb-20">
+        
+        <!-- Header / Mini Nav -->
+        <header class="pt-10 pb-6 px-4 text-center">
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-pastelPink/70 border border-softPink/50 text-deepRose text-xs font-semibold tracking-wider uppercase mb-4">
+                <span>🌸</span> Khusus Untukmu, Sofia
+            </div>
+            <h1 class="font-serif text-4xl sm:text-5xl md:text-6xl font-bold text-deepRose leading-tight">
+                Maafkan Aku, Sayang
+            </h1>
+            <p class="mt-3 text-roseGold text-sm sm:text-base max-w-xl mx-auto">
+                Website kecil ini kubuat khusus untukmu, sebagai tanda betapa tulusnya aku menyesal dan betapa berharganya dirimu di hidupku.
+            </p>
+        </header>
+
+        <!-- 2. SURAT PERMINTAAN MAAF UTAMA -->
+        <section class="max-w-3xl mx-auto px-4 sm:px-6 my-10">
+            <div class="bg-white/90 backdrop-blur-sm rounded-3xl p-6 sm:p-10 shadow-xl border border-pastelPink relative overflow-hidden">
+                <!-- Decorative corner -->
+                <div class="absolute top-0 right-0 w-24 h-24 bg-pastelPink/40 rounded-bl-full -mr-6 -mt-6"></div>
+                <div class="absolute bottom-0 left-0 w-20 h-20 bg-warmCream rounded-tr-full -ml-6 -mb-6"></div>
+
+                <div class="relative z-10">
+                    <div class="flex items-center gap-3 mb-6">
+                        <span class="text-3xl">✉️</span>
+                        <h2 class="font-serif text-2xl sm:text-3xl font-bold text-deepRose">Untuk Sofia Tersayang,</h2>
+                    </div>
+
+                    <div class="space-y-4 text-sm sm:text-base leading-relaxed text-[#5C4246]">
+                        <p>
+                            Aku menulis ini dengan hati yang benar-benar menyesal. Aku sadar sepenuhnya atas kesalahanku kemarin, dan aku tidak ingin mencari-cari alasan atau pembenaran apa pun. Aku salah, dan aku minta maaf karena sudah membuatmu kecewa, sedih, atau merasa tidak nyaman.
+                        </p>
+                        <p>
+                            Melihatmu murung atau menjauh dariku adalah hal yang paling tidak aku inginkan. Kamu terlalu berharga untuk disakiti, bahkan oleh hal kecil sekalipun. Setiap tawa, perhatian, dan kehadiranmu di hidupku adalah anugerah yang selalu aku syukuri.
+                        </p>
+                        <p>
+                            Aku tidak hanya ingin mengucapkan kata "maaf" lewat bibir saja, tapi aku ingin membuktikannya lewat sikap dan perubahanku ke depan. Terima kasih sudah selalu sabar menghadapiku selama ini.
+                        </p>
+                    </div>
+
+                    <div class="mt-8 pt-6 border-t border-pastelPink flex items-center justify-between">
+                        <div>
+                            <p class="text-xs text-roseGold uppercase tracking-wider font-semibold">Dengan penuh penyesalan & sayang,</p>
+                            <p class="font-serif italic text-xl text-deepRose font-bold mt-1">Pasanganmu yang selalu menyayangimu ❤️</p>
+                        </div>
+                        <span class="text-3xl animate-pulse">🌹</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. KARTU INTERAKTIF 'JANJI-JANJIKU' (FLIP CARDS) -->
+        <section class="max-w-5xl mx-auto px-4 sm:px-6 my-16">
+            <div class="text-center mb-10">
+                <span class="text-xs font-semibold tracking-widest uppercase text-roseGold">Komitmen Nyata</span>
+                <h2 class="font-serif text-3xl sm:text-4xl font-bold text-deepRose mt-1">Janji-Janjiku Untukmu</h2>
+                <p class="text-sm text-roseGold/90 mt-2">Ketuk setiap kartu untuk melihat janjiku padamu 🤍</p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Card 1 -->
+                <div class="flip-card h-56 perspective-1000 cursor-pointer" onclick="this.classList.toggle('flipped')">
+                    <div class="flip-card-inner relative w-full h-full transform-style-3d">
+                        <!-- Front -->
+                        <div class="absolute inset-0 backface-hidden bg-gradient-to-br from-pastelPink to-white rounded-2xl p-6 shadow-md border border-softPink/60 flex flex-col items-center justify-center text-center">
+                            <span class="text-4xl mb-3">👂</span>
+                            <h3 class="font-serif text-xl font-bold text-deepRose">Lebih Sabar Mendengar</h3>
+                            <p class="text-xs text-roseGold mt-2">Ketuk untuk membuka</p>
+                        </div>
+                        <!-- Back -->
+                        <div class="absolute inset-0 backface-hidden rotate-y-180 bg-deepRose text-white rounded-2xl p-6 shadow-lg flex flex-col items-center justify-center text-center">
+                            <p class="text-sm leading-relaxed">
+                                "Aku berjanji akan lebih banyak mendengar perasaanmu tanpa menyela, memahami sudut pandangmu, dan tidak langsung terbawa emosi."
+                            </p>
+                            <span class="mt-3 text-xs text-pastelPink">❤️ Janji #1</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="flip-card h-56 perspective-1000 cursor-pointer" onclick="this.classList.toggle('flipped')">
+                    <div class="flip-card-inner relative w-full h-full transform-style-3d">
+                        <div class="absolute inset-0 backface-hidden bg-gradient-to-br from-warmCream to-white rounded-2xl p-6 shadow-md border border-softPink/60 flex flex-col items-center justify-center text-center">
+                            <span class="text-4xl mb-3">🛡️</span>
+                            <h3 class="font-serif text-xl font-bold text-deepRose">Tidak Mengulangi</h3>
+                            <p class="text-xs text-roseGold mt-2">Ketuk untuk membuka</p>
+                        </div>
+                        <div class="absolute inset-0 backface-hidden rotate-y-180 bg-deepRose text-white rounded-2xl p-6 shadow-lg flex flex-col items-center justify-center text-center">
+                            <p class="text-sm leading-relaxed">
+                                "Aku belajar dari kesalahanku kali ini. Aku berjanji tidak akan mengulangi hal yang sama yang bisa melukai hatimu lagi."
+                            </p>
+                            <span class="mt-3 text-xs text-pastelPink">❤️ Janji #2</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="flip-card h-56 perspective-1000 cursor-pointer" onclick="this.classList.toggle('flipped')">
+                    <div class="flip-card-inner relative w-full h-full transform-style-3d">
+                        <div class="absolute inset-0 backface-hidden bg-gradient-to-br from-pastelPink to-white rounded-2xl p-6 shadow-md border border-softPink/60 flex flex-col items-center justify-center text-center">
+                            <span class="text-4xl mb-3">⏳</span>
+                            <h3 class="font-serif text-xl font-bold text-deepRose">Selalu Meluangkan Waktu</h3>
+                            <p class="text-xs text-roseGold mt-2">Ketuk untuk membuka</p>
+                        </div>
+                        <div class="absolute inset-0 backface-hidden rotate-y-180 bg-deepRose text-white rounded-2xl p-6 shadow-lg flex flex-col items-center justify-center text-center">
+                            <p class="text-sm leading-relaxed">
+                                "Sesibuk apa pun hariku, kamu tetap prioritasku. Aku akan selalu menyisihkan waktu berkualitas hanya untuk kita berdua."
+                            </p>
+                            <span class="mt-3 text-xs text-pastelPink">❤️ Janji #3</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 4 -->
+                <div class="flip-card h-56 perspective-1000 cursor-pointer" onclick="this.classList.toggle('flipped')">
+                    <div class="flip-card-inner relative w-full h-full transform-style-3d">
+                        <div class="absolute inset-0 backface-hidden bg-gradient-to-br from-warmCream to-white rounded-2xl p-6 shadow-md border border-softPink/60 flex flex-col items-center justify-center text-center">
+                            <span class="text-4xl mb-3">💬</span>
+                            <h3 class="font-serif text-xl font-bold text-deepRose">Komunikasi Lebih Jujur</h3>
+                            <p class="text-xs text-roseGold mt-2">Ketuk untuk membuka</p>
+                        </div>
+                        <div class="absolute inset-0 backface-hidden rotate-y-180 bg-deepRose text-white rounded-2xl p-6 shadow-lg flex flex-col items-center justify-center text-center">
+                            <p class="text-sm leading-relaxed">
+                                "Aku berjanji untuk selalu terbuka, tidak memendam masalah, dan selalu memberi kabar agar kamu tidak pernah merasa khawatir."
+                            </p>
+                            <span class="mt-3 text-xs text-pastelPink">❤️ Janji #4</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 5 -->
+                <div class="flip-card h-56 perspective-1000 cursor-pointer" onclick="this.classList.toggle('flipped')">
+                    <div class="flip-card-inner relative w-full h-full transform-style-3d">
+                        <div class="absolute inset-0 backface-hidden bg-gradient-to-br from-pastelPink to-white rounded-2xl p-6 shadow-md border border-softPink/60 flex flex-col items-center justify-center text-center">
+                            <span class="text-4xl mb-3">🤗</span>
+                            <h3 class="font-serif text-xl font-bold text-deepRose">Menjaga Senyummu</h3>
+                            <p class="text-xs text-roseGold mt-2">Ketuk untuk membuka</p>
+                        </div>
+                        <div class="absolute inset-0 backface-hidden rotate-y-180 bg-deepRose text-white rounded-2xl p-6 shadow-lg flex flex-col items-center justify-center text-center">
+                            <p class="text-sm leading-relaxed">
+                                "Tujuanku adalah membuatmu tersenyum setiap hari, bukan membuatmu menangis. Aku akan selalu berusaha jadi alasan bahagiamu."
+                            </p>
+                            <span class="mt-3 text-xs text-pastelPink">❤️ Janji #5</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 6 -->
+                <div class="flip-card h-56 perspective-1000 cursor-pointer" onclick="this.classList.toggle('flipped')">
+                    <div class="flip-card-inner relative w-full h-full transform-style-3d">
+                        <div class="absolute inset-0 backface-hidden bg-gradient-to-br from-warmCream to-white rounded-2xl p-6 shadow-md border border-softPink/60 flex flex-col items-center justify-center text-center">
+                            <span class="text-4xl mb-3">🌱</span>
+                            <h3 class="font-serif text-xl font-bold text-deepRose">Tumbuh Lebih Dewasa</h3>
+                            <p class="text-xs text-roseGold mt-2">Ketuk untuk membuka</p>
+                        </div>
+                        <div class="absolute inset-0 backface-hidden rotate-y-180 bg-deepRose text-white rounded-2xl p-6 shadow-lg flex flex-col items-center justify-center text-center">
+                            <p class="text-sm leading-relaxed">
+                                "Aku ingin terus belajar menjadi pasangan yang lebih dewasa, lebih peka, dan lebih pantas untuk mendampingi seseorang sehebat kamu."
+                            </p>
+                            <span class="mt-3 text-xs text-pastelPink">❤️ Janji #6</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. HAL-HAL YANG AKU KAGUMI DARIMU -->
+        <section class="max-w-4xl mx-auto px-4 sm:px-6 my-16">
+            <div class="bg-warmCream/80 rounded-3xl p-6 sm:p-10 border border-softPink/40 shadow-lg">
+                <div class="text-center mb-8">
+                    <span class="text-xs font-semibold tracking-widest uppercase text-roseGold">Mengapa Kamu Spesial</span>
+                    <h2 class="font-serif text-3xl sm:text-4xl font-bold text-deepRose mt-1">Hal-Hal yang Aku Kagumi Darimu</h2>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-white/90 p-5 rounded-2xl shadow-sm border border-pastelPink flex items-start gap-4 hover:shadow-md transition-shadow">
+                        <span class="text-2xl bg-pastelPink/60 p-2.5 rounded-xl">😊</span>
+                        <div>
+                            <h3 class="font-serif font-bold text-deepRose text-lg">Senyumanmu yang Menenangkan</h3>
+                            <p class="text-sm text-[#5C4246] mt-1">Sekacau apa pun hariku, melihat senyummu selalu berhasil membuat semuanya terasa baik-baik saja.</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white/90 p-5 rounded-2xl shadow-sm border border-pastelPink flex items-start gap-4 hover:shadow-md transition-shadow">
+                        <span class="text-2xl bg-pastelPink/60 p-2.5 rounded-xl">💖</span>
+                        <div>
+                            <h3 class="font-serif font-bold text-deepRose text-lg">Hati yang Tulus & Lembut</h3>
+                            <p class="text-sm text-[#5C4246] mt-1">Caramu peduli pada orang-orang di sekitarmu, termasuk aku, selalu membuatku kagum.</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white/90 p-5 rounded-2xl shadow-sm border border-pastelPink flex items-start gap-4 hover:shadow-md transition-shadow">
+                        <span class="text-2xl bg-pastelPink/60 p-2.5 rounded-xl">✨</span>
+                        <div>
+                            <h3 class="font-serif font-bold text-deepRose text-lg">Kesabaranmu yang Luar Biasa</h3>
+                            <p class="text-sm text-[#5C4246] mt-1">Terima kasih sudah selalu sabar menghadapi kekuranganku dan tetap memilih bertahan bersamaku.</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white/90 p-5 rounded-2xl shadow-sm border border-pastelPink flex items-start gap-4 hover:shadow-md transition-shadow">
+                        <span class="text-2xl bg-pastelPink/60 p-2.5 rounded-xl">🌟</span>
+                        <div>
+                            <h3 class="font-serif font-bold text-deepRose text-lg">Caramu Menjadi Diri Sendiri</h3>
+                            <p class="text-sm text-[#5C4246] mt-1">Setiap hal kecil tentangmu—tawamu, ceritamu, bahkan saat kamu ngambek—semuanya membuatku jatuh cinta lagi.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. VOUCHER PERMINTAAN MAAF (LOVE COUPONS) -->
+        <section class="max-w-5xl mx-auto px-4 sm:px-6 my-16">
+            <div class="text-center mb-10">
+                <span class="text-xs font-semibold tracking-widest uppercase text-roseGold">Tanda Perdamaian</span>
+                <h2 class="font-serif text-3xl sm:text-4xl font-bold text-deepRose mt-1">Voucher Spesial Untuk Sofia</h2>
+                <p class="text-sm text-roseGold/90 mt-2">Pilih dan klaim voucher yang kamu mau, kapan pun kamu siap 🎟️</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Voucher 1 -->
+                <div class="bg-white rounded-2xl p-6 shadow-md border-2 border-dashed border-softPink flex flex-col justify-between relative overflow-hidden">
+                    <div>
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="text-3xl">🍽️</span>
+                            <span class="text-xs font-bold uppercase tracking-wider px-3 py-1 bg-pastelPink text-deepRose rounded-full">Love Coupon</span>
+                        </div>
+                        <h3 class="font-serif text-xl font-bold text-deepRose">Voucher Makan Malam Spesial</h3>
+                        <p class="text-sm text-[#5C4246] mt-2">Bebas pilih restoran atau makanan favoritmu. Aku yang traktir dan temani sepuasnya!</p>
+                    </div>
+                    <button onclick="claimVoucher(this, 'Voucher Makan Malam Spesial')" class="mt-6 w-full py-2.5 rounded-xl bg-roseGold hover:bg-deepRose text-white font-semibold text-sm transition-all active:scale-95 shadow-sm">
+                        Klaim Voucher ✨
+                    </button>
+                </div>
+
+                <!-- Voucher 2 -->
+                <div class="bg-white rounded-2xl p-6 shadow-md border-2 border-dashed border-softPink flex flex-col justify-between relative overflow-hidden">
+                    <div>
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="text-3xl">🚗</span>
+                            <span class="text-xs font-bold uppercase tracking-wider px-3 py-1 bg-pastelPink text-deepRose rounded-full">Love Coupon</span>
+                        </div>
+                        <h3 class="font-serif text-xl font-bold text-deepRose">Voucher Jalan-Jalan Bebas Pilih</h3>
+                        <p class="text-sm text-[#5C4246] mt-2">Mau ke pantai, kafe estetik, nonton bioskop, atau keliling kota? Kamu yang tentukan tujuannya!</p>
+                    </div>
+                    <button onclick="claimVoucher(this, 'Voucher Jalan-Jalan Bebas Pilih')" class="mt-6 w-full py-2.5 rounded-xl bg-roseGold hover:bg-deepRose text-white font-semibold text-sm transition-all active:scale-95 shadow-sm">
+                        Klaim Voucher ✨
+                    </button>
+                </div>
+
+                <!-- Voucher 3 -->
+                <div class="bg-white rounded-2xl p-6 shadow-md border-2 border-dashed border-softPink flex flex-col justify-between relative overflow-hidden">
+                    <div>
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="text-3xl">🫂</span>
+                            <span class="text-xs font-bold uppercase tracking-wider px-3 py-1 bg-pastelPink text-deepRose rounded-full">Love Coupon</span>
+                        </div>
+                        <h3 class="font-serif text-xl font-bold text-deepRose">Voucher Peluk & Dengerin Curhat</h3>
+                        <p class="text-sm text-[#5C4246] mt-2">Berlaku tanpa batas waktu! Pelukan hangat dan aku siap jadi pendengar setiamu sepuasnya.</p>
+                    </div>
+                    <button onclick="claimVoucher(this, 'Voucher Peluk & Dengerin Curhat')" class="mt-6 w-full py-2.5 rounded-xl bg-roseGold hover:bg-deepRose text-white font-semibold text-sm transition-all active:scale-95 shadow-sm">
+                        Klaim Voucher ✨
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 6. PERTANYAAN PENUTUP INTERAKTIF -->
+        <section class="max-w-2xl mx-auto px-4 sm:px-6 my-16 text-center">
+            <div class="bg-gradient-to-b from-white to-pastelPink/50 rounded-3xl p-8 sm:p-12 shadow-xl border border-softPink relative">
+                <span class="text-4xl inline-block mb-3 animate-bounce">🥺</span>
+                <h2 class="font-serif text-3xl sm:text-4xl font-bold text-deepRose">Kamu Mau Maafin Aku?</h2>
+                <p class="text-sm sm:text-base text-roseGold mt-2 mb-8">Aku harap hatimu bisa luluh dan kita bisa senyum bareng lagi hari ini.</p>
+
+                <div id="button-container" class="flex flex-col sm:flex-row items-center justify-center gap-4 min-h-[100px] relative">
+                    <button id="btn-forgive" onclick="forgiveMe()" class="px-8 py-3.5 rounded-full bg-gradient-to-r from-roseGold to-deepRose text-white font-bold text-base shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 transition-all z-20">
+                        Iya, Aku Maafin ❤️
+                    </button>
+
+                    <button id="btn-think" onmouseover="dodgeButton()" onclick="dodgeButton()" class="px-6 py-3 rounded-full bg-white text-roseGold border border-softPink font-semibold text-sm shadow-sm transition-all duration-200 z-10">
+                        Masih Mikir-Mikir 😠
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="text-center text-xs text-roseGold/80 py-6">
+            Dibuat dengan sepenuh hati untuk Sofia ❤️
+        </footer>
+    </main>
+
+    <!-- MODAL TERIMA KASIH (Saat 'Iya, Aku Maafin' diklik) -->
+    <div id="thank-you-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40 backdrop-blur-sm px-4">
+        <div class="bg-cream rounded-3xl p-8 max-w-md w-full text-center shadow-2xl border-2 border-softPink transform scale-95 transition-transform duration-300" id="modal-box">
+            <div class="text-5xl mb-4">🥳❤️</div>
+            <h3 class="font-serif text-3xl font-bold text-deepRose">Yeay! Terima Kasih, Sofia!</h3>
+            <p class="text-sm sm:text-base text-[#5C4246] mt-3 leading-relaxed">
+                Kamu bikin aku jadi orang paling bahagia hari ini! Aku janji nggak akan menyia-nyiakan kesempatan ini. Love you so much, Sofia! 💖
+            </p>
+            <button onclick="closeModal()" class="mt-6 px-8 py-3 rounded-full bg-deepRose text-white font-semibold text-sm shadow-md hover:bg-roseGold transition-all">
+                Peluk Virtual 🫂
+            </button>
+        </div>
+    </div>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // 1. Buka Amplop
+        function openEnvelope() {
+            const envelope = document.getElementById('envelope');
+            const envelopeScreen = document.getElementById('envelope-screen');
+            const mainContent = document.getElementById('main-content');
+
+            envelope.classList.add('envelope-open');
+
+            setTimeout(() => {
+                envelopeScreen.style.opacity = '0';
+                envelopeScreen.style.pointerEvents = 'none';
+                
+                mainContent.classList.remove('hidden');
+                setTimeout(() => {
+                    mainContent.style.opacity = '1';
+                    envelopeScreen.style.display = 'none';
+                }, 100);
+            }, 900);
+        }
+
+        // 2. Toast Notification Helper
+        function showToast(message, icon = '✨') {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-message').textContent = message;
+            document.getElementById('toast-icon').textContent = icon;
+            
+            toast.classList.remove('opacity-0', 'pointer-events-none');
+            toast.classList.add('opacity-100');
+
+            setTimeout(() => {
+                toast.classList.remove('opacity-100');
+                toast.classList.add('opacity-0', 'pointer-events-none');
+            }, 3000);
+        }
+
+        // 3. Klaim Voucher
+        function claimVoucher(btn, voucherName) {
+            if (btn.disabled) return;
+            btn.disabled = true;
+            btn.innerHTML = 'Sudah Diklaim ✅';
+            btn.classList.remove('bg-roseGold', 'hover:bg-deepRose');
+            btn.classList.add('bg-pastelPink', 'text-deepRose', 'cursor-default');
+            showToast(`${voucherName} berhasil diklaim!`, '🎟️');
+        }
+
+        // 4. Tombol 'Masih Mikir-Mikir' Menghindar & Mengecil
+        let dodgeCount = 0;
+        function dodgeButton() {
+            const btn = document.getElementById('btn-think');
+            dodgeCount++;
+
+            const maxOffset = 110;
+            const randomX = (Math.random() - 0.5) * 2 * maxOffset;
+            const randomY = (Math.random() - 0.5) * 2 * (maxOffset * 0.6);
+            const scale = Math.max(0.55, 1 - dodgeCount * 0.08);
+
+            btn.style.transform = `translate(${randomX}px, ${randomY}px) scale(${scale})`;
+
+            if (dodgeCount === 3) {
+                showToast('Jangan lama-lama mikirnya dong 🥺', '💕');
+            } else if (dodgeCount >= 6) {
+                btn.textContent = 'Klik yang merah aja ❤️';
+            }
+        }
+
+        // 5. Tombol 'Iya, Aku Maafin' -> Konfeti Hati & Modal
+        function forgiveMe() {
+            launchHeartConfetti();
+            const modal = document.getElementById('thank-you-modal');
+            const modalBox = document.getElementById('modal-box');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            setTimeout(() => {
+                modalBox.classList.remove('scale-95');
+                modalBox.classList.add('scale-100');
+            }, 50);
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('thank-you-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            showToast('Peluk virtual terkirim! 🫂❤️', '💖');
+        }
+
+        // 6. Canvas Background: Kelopak Bunga & Hati Berjatuhan
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        let confetti = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Petal {
+            constructor() {
+                this.reset();
+                this.y = Math.random() * canvas.height;
+            }
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = -20;
+                this.size = Math.random() * 8 + 6;
+                this.speedY = Math.random() * 1.2 + 0.6;
+                this.speedX = Math.random() * 0.8 - 0.4;
+                this.opacity = Math.random() * 0.5 + 0.3;
+                this.isHeart = Math.random() > 0.65;
+                this.color = this.isHeart ? '#FFB3C6' : '#FFD6E0';
+                this.angle = Math.random() * Math.PI * 2;
+                this.spin = Math.random() * 0.02 - 0.01;
+            }
+            update() {
+                this.y += this.speedY;
+                this.x += this.speedX + Math.sin(this.y * 0.01) * 0.3;
+                this.angle += this.spin;
+                if (this.y > canvas.height + 20) this.reset();
+            }
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.opacity;
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.angle);
+                ctx.fillStyle = this.color;
+                if (this.isHeart) {
+                    ctx.font = `${this.size + 4}px serif`;
+                    ctx.fillText('❤', -this.size / 2, this.size / 2);
+                } else {
+                    ctx.beginPath();
+                    ctx.ellipse(0, 0, this.size, this.size / 2, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                ctx.restore();
+            }
+        }
+
+        for (let i = 0; i < 32; i++) {
+            particles.push(new Petal());
+        }
+
+        function launchHeartConfetti() {
+            const colors = ['#FF4D6D', '#FF758F', '#FFB3C6', '#B76E79', '#FFD166'];
+            for (let i = 0; i < 90; i++) {
+                confetti.push({
+                    x: canvas.width / 2,
+                    y: canvas.height / 2,
+                    vx: (Math.random() - 0.5) * 14,
+                    vy: (Math.random() - 0.7) * 14,
+                    size: Math.random() * 12 + 8,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    alpha: 1,
+                    gravity: 0.25
+                });
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+
+            for (let i = confetti.length - 1; i >= 0; i--) {
+                const c = confetti[i];
+                c.x += c.vx;
+                c.y += c.vy;
+                c.vy += c.gravity;
+                c.alpha -= 0.012;
+
+                if (c.alpha <= 0) {
+                    confetti.splice(i, 1);
+                    continue;
+                }
+
+                ctx.save();
+                ctx.globalAlpha = c.alpha;
+                ctx.fillStyle = c.color;
+                ctx.font = `${c.size}px serif`;
+                ctx.fillText('❤️', c.x, c.y);
+                ctx.restore();
+            }
+
+            requestAnimationFrame(animate);
+        }
+
+        window.onload = function() {
+            animate();
+        };
+    </script>
+</body>
+</html>
